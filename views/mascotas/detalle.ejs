@@ -1,17 +1,16 @@
 <article class="detalle">
-  <!-- Imagen de la mascota (si no tiene, muestra una por defecto) -->
   <img 
-    src="/img/<%= mascota.imagen %>" 
+    src="<%= mascota.imagen %>" 
     alt="<%= mascota.nombre %>" 
     class="imagen-mascota"
-    onerror="this.onerror=null; this.src='/img/marca.svg';"
+    onerror="this.onerror=null; this.src='/img/mascota.svg';"
   >
-
+  
   <p class="etiqueta"><%= mascota.especie %></p>
   <h1><%= mascota.nombre %></h1>
-  <p class="edad"><%= mascota.edad %></p>
-  <p class="precio">$<%= Number(mascota.precio ?? 0).toLocaleString("es-AR") %></p>
-  <p><%= mascota.descripcion %></p>
+  <p><strong>Edad:</strong> <%= mascota.edad %> <%= Number(mascota.edad) === 1 ? 'año' : 'años' %></p>
+  <p><strong>Estado:</strong> <%= mascota.estado %></p>
+  <p><strong>Descripción:</strong> <%= mascota.descripcion %></p>
 
-  <a href="/mascotas">Volver al catálogo</a>
+  <a href="/mascotas" class="boton">Volver al catálogo</a>
 </article>

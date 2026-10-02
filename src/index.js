@@ -20,7 +20,7 @@ async function main() {
 
   // incorporo esta linea para poder recibir datos de formularios en formato x-www-form-urlencoded//
   app.use(express.urlencoded({ extended: false }));
-  // Definimos las rutas de la aplicación para manejar las solicitudes HTTP y renderizar las vistas correspondientes
+  // Definino las rutas de la aplicación para manejar las solicitudes HTTP y renderizar las vistas correspondientes
   app.get("/api/mascotas", (req, res) => {
     res.json(mascotas);
   });
@@ -60,61 +60,54 @@ async function main() {
       mascota,
     });
   });
-  // Definimos la ruta para manejar la creación de una nueva mascota mediante una solicitud POST, validando los datos recibidos y guardándolos en el archivo JSON y en el arreglo de mascotas
-  // ruta para crear una nueva mascota
+ 
+// Ruta para crear una nueva mascota mediante POST
 app.post("/mascotas", (req, res) => {
-  const { nombre, especie, precio, edad, descripcion, imagen } = req.body;
-
+   // 1. Extraer datos incluyendo 'estado'
+  const { nombre, especie, edad, descripcion, estado } = req.body;
+ // 2. Limpiar cadenas de texto
   const nombreLimpio = String(nombre ?? "").trim();
   const especieLimpia = String(especie ?? "").trim();
-  const precioLimpio = Number(precio ?? 0);
-  const edadLimpia = String(edad ?? "").trim();
-  const descripcionLimpia = String(descripcion ?? "").trim();
   
-  // Si no viene imagen, se asigna una por defecto o string vacío
-  const imagenLimpia = String(imagen ?? "marca.svg").trim();
+  const descripcionLimpia = String(descripcion ?? "").trim();
+  const estadoLimpio = String(estado ?? "").trim();
 
-  // ¿ que se realizo para que funcione el código? se Quito !imagenLimpia del chequeo de obligatorios
-  if (!nombreLimpio || !especieLimpia || !precioLimpio || !edadLimpia || !descripcionLimpia) {
+  // 3. Convertir y validar edad
+  const edadNum = Number(edad);
+  
+  const edadEsInvalida = edad === "" || isNaN(edadNum) || edadNum < 0;
+
+  // 4. Validar campos obligatorios y edad no negativa
+  
+  if (!nombreLimpio || !especieLimpia || !descripcionLimpia || !estadoLimpio || edadEsInvalida) {
     return res.status(400).render("mascotas/nueva", {
       titulo: "Nueva mascota",
-      error: "Completá todos los campos con valores válidos.",
+      error: "Completá todos los campos con valores válidos (la edad debe ser un número mayor o igual a 0).",
       valores: req.body,
     });
   }
-// Calculamos el último ID de las mascotas existentes para asignar un nuevo ID a la mascota que se va a crear
+    // 5. Calcular el nuevo ID dentro de la función POST
   const ultimoId = mascotas.reduce(
-    (mayorId, mascota) => Math.max(mayorId, mascota.id),
-    0
+    (mayorId, mascota) => Math.max(mayorId, mascota.id), 0
   );
+  const nuevoId = ultimoId + 1;
 
-  // aqui complete el resto del código para guardar la mascota
-
-  // comentario de recuerdo: se Guardo la nueva mascota en el arreglo y se  escribimos en el archivo JSON
-  escribirJson(rutaDatos, [...mascotas, {
-    id: ultimoId + 1,
+  // 6. Crear objeto con imagen fija '/img/mascota.svg'
+  const nuevaMascota = {
+    id: nuevoId,
     nombre: nombreLimpio,
     especie: especieLimpia,
-    precio: precioLimpio, 
-    edad: edadLimpia,
+    edad: edadNum,
     descripcion: descripcionLimpia,
-    imagen: imagenLimpia, 
-      
-   }]);
-//que hace pusch? push agrega un nuevo elemento al final del arreglo. En este caso, se está agregando un objeto que representa una nueva mascota con sus propiedades (id, nombre, especie, precio, edad, descripcion e imagen) al arreglo de mascotas existente. Esto permite que la nueva mascota se incluya en la lista de mascotas y se pueda acceder a ella posteriormente.
-    mascotas.push({
-      id: ultimoId + 1,
-      nombre: nombreLimpio,
-      especie: especieLimpia,
-      precio: precioLimpio,
-      edad: edadLimpia,
-      descripcion: descripcionLimpia,
-      imagen: imagenLimpia,
-    });
+    estado: estadoLimpio,
+    imagen: "/img/mascota.svg"
+  };
 
-    // Redirigimos al usuario a la lista de mascotas después de guardar la nueva mascota
-    res.redirect("/mascotas");
-  });
+  // 7. Guardar SOLO en el arreglo en memoria y redirigir
+  mascotas.push(nuevaMascota);
+  res.redirect("/mascotas");
+});
+
 
   app.listen(PORT, () => {
     console.log(`Aplicación disponible en http://localhost:${PORT}`);

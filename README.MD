@@ -1,5 +1,4 @@
-ALUMNO: Héctor Santiago Orellana Gonzalez
-# Nombre del Proyecto:
+## Nombre del Proyecto:
 Trabajo práctico 04 - Aplicación web con EJS
 # Descripción: 
 Creación de una aplicación web para consultar mascotas en adopción y agregar temporalmente nuevos registros
